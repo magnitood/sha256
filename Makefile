@@ -16,7 +16,7 @@ test: build file.txt
 	./$(EXE) file.txt
 
 file.txt:
-	echo -ne "abc" > file.txt
+	echo -ne "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" > file.txt
 
 clean:
 	rm -rf $(EXE) file.txt
