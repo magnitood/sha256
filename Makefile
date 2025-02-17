@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -O3
+CFLAGS=-Wall -Wextra -O3 -DNDEBUG
 LDFLAGS=
 
 EXE=main
@@ -10,10 +10,7 @@ $(EXE): $(SRC)
 
 .PHONY: run clean
 
-build: $(EXE) Makefile
-
-run: build
-	./$(EXE)
+build: $(EXE)
 
 test: build file.txt
 	./$(EXE) file.txt
