@@ -108,7 +108,7 @@ void sha256(FILE *fp)
 #endif
 		msg_buf[bytes_written] = 0x80; // appending 1000 0000 to the msg
 		if (bytes_written < 56) { // 1 block padding
-			for (size_t i = bytes_written+1; i < 56; i++) {
+			for (int i = bytes_written+1; i < 56; i++) {
 				msg_buf[i] = 0;
 			}
 			// uint64_t *len_bits = (uint64_t *) &msg_buf[56]; // wont work because of endianness
@@ -133,11 +133,11 @@ void sha256(FILE *fp)
 
 		} else { // 2 block padding
 
-			for (size_t i = bytes_written + 1; i < 64; i++) {
+			for (int i = bytes_written + 1; i < 64; i++) {
 				msg_buf[i] = 0;
 			}
 			sha256_round(msg_buf);
-			for (size_t i = 0; i < 56; i++) {
+			for (int i = 0; i < 56; i++) {
 				msg_buf[i] = 0;
 			}
 
@@ -158,5 +158,16 @@ void sha256(FILE *fp)
 
 void print_digest()
 {
-	printf("%x%x%x%x%x%x%x%x\n", H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7]);
+	// printf("%x%x%x%x%x%x%x%x\n", H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7]); // won't work for hashes having msb 0
+	for (int i = 0; i < 8; i++) {
+		uint32_t num = H[i];
+		char hex[9];
+		hex[8] = '\0';
+		for (int i = 7; i >= 0; i--) {
+			hex[i] = "0123456789abcdef"[num % 16];
+			num = num / 16;
+		}
+		printf("%s", hex);
+	}
+	putchar('\n');
 }
