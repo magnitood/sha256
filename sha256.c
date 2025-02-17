@@ -109,7 +109,7 @@ void sha256(FILE *fp)
 		msg_buf[bytes_written] = 0x80; // appending 1000 0000 to the msg
 		if (bytes_written < 56) { // 1 block padding
 			for (size_t i = bytes_written+1; i < 56; i++) {
-				msg_buf[i] = 0x00;
+				msg_buf[i] = 0;
 			}
 			// uint64_t *len_bits = (uint64_t *) &msg_buf[56]; // wont work because of endianness
 			// *len_bits = total_bytes_read * 8;
@@ -130,7 +130,28 @@ void sha256(FILE *fp)
 			}
 #endif
 			sha256_round(msg_buf);
+
 		} else { // 2 block padding
+
+			for (size_t i = bytes_written + 1; i < 64; i++) {
+				msg_buf[i] = 0;
+			}
+			sha256_round(msg_buf);
+			for (size_t i = 0; i < 56; i++) {
+				msg_buf[i] = 0;
+			}
+
+			uint64_t total_bits_read = total_bytes_read * 8;
+			msg_buf[56] = (total_bits_read >> 7*8) & 0xFF;
+			msg_buf[57] = (total_bits_read >> 6*8) & 0xFF;
+			msg_buf[58] = (total_bits_read >> 5*8) & 0xFF;
+			msg_buf[59] = (total_bits_read >> 4*8) & 0xFF;
+			msg_buf[60] = (total_bits_read >> 3*8) & 0xFF;
+			msg_buf[61] = (total_bits_read >> 2*8) & 0xFF;
+			msg_buf[62] = (total_bits_read >> 1*8) & 0xFF;
+			msg_buf[63] = (total_bits_read >> 0*8) & 0xFF;
+			sha256_round(msg_buf);
+
 		}
 	}
 }
