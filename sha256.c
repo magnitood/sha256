@@ -2,6 +2,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
+/* Read the SHA Specification to understand this file
+ * https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
+ * */
 
 /* SHA256 constants */
 uint32_t K[64] = {
@@ -32,16 +35,10 @@ void sha256_round(uint8_t msg[])
 
 	for (int t = 0; t <= 15; t++) {
 		W[t] = arr[t];
-#ifndef NDEBUG
-		printf("W[%d] = %x\n", t, W[t]);
-#endif
 	}
 
 	for (int t = 16; t <= 63; t++) {
 		W[t] = s1(W[t-2]) + W[t-7] + s0(W[t-15]) + W[t-16];
-#ifndef NDEBUG
-		printf("W[%d] = %x\n", t, W[t]);
-#endif
 	}
 
 	uint32_t a = H[0];
@@ -64,9 +61,6 @@ void sha256_round(uint8_t msg[])
 		c = b;
 		b = a;
 		a = T1 + T2;
-#ifndef NDEBUG
-		printf("%x %x %x %x %x %x %x %x\n", a, b, c, d, e, f, g, h);
-#endif
 	}
 
 	H[0] += a;
@@ -96,16 +90,10 @@ void sha256(FILE *fp)
 
 	if (bytes_written == 0)
 		return;
-#ifndef NDEBUG
-	printf("%lu\n", bytes_written);
-#endif
 
 	assert(feof(fp));
 	if (bytes_written < 64) {
 		total_bytes_read += bytes_written;
-#ifndef NDEBUG
-		printf("total: %lu\n", total_bytes_read);
-#endif
 		msg_buf[bytes_written] = 0x80; // appending 1000 0000 to the msg
 		if (bytes_written < 56) { // 1 block padding
 			for (int i = bytes_written+1; i < 56; i++) {
@@ -124,11 +112,6 @@ void sha256(FILE *fp)
 			msg_buf[62] = (total_bits_read >> 1*8) & 0xFF;
 			msg_buf[63] = (total_bits_read >> 0*8) & 0xFF;
 
-#ifndef NDEBUG
-			for (int i = 0; i < 64; i++) {
-				printf("%x", msg_buf[i]);
-			}
-#endif
 			sha256_round(msg_buf);
 
 		} else { // 2 block padding
