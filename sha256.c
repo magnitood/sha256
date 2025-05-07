@@ -1,6 +1,7 @@
 #include "sha256.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <string.h>
 
 /* Read the SHA Specification to understand this file
  * https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf
@@ -24,17 +25,18 @@ uint32_t H[8] = {
 	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
 };
 
+static inline uint32_t convert_endianness(uint8_t *arr)
+{
+	return (arr[0] << 24) | (arr[1] << 16) | (arr[2] << 8) | (arr[3]);
+}
+
+// size of msg is 256 byte
 void sha256_round(uint8_t msg[])
 {
-	uint32_t *arr = (uint32_t *) msg;
-	for (int i = 0; i < 16; i++) {
-		arr[i] = (msg[4*i] << 8*3) | (msg[4*i+1] << 8*2) | (msg[4*i+2] << 8*1) | (msg[4*i+3] << 8*0); // convert to big endian
-	}
 
 	uint32_t W[64];
-
 	for (int t = 0; t <= 15; t++) {
-		W[t] = arr[t];
+		W[t] = convert_endianness(&msg[4*t]);
 	}
 
 	for (int t = 16; t <= 63; t++) {

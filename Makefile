@@ -1,9 +1,9 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -O3 -DNDEBUG
+CFLAGS=-W -Wall -Wextra -O3 -DNDEBUG -march=native
 LDFLAGS=
 
 EXE=main
-SRC=main.c sha256.h sha256.c
+SRC=main.c sha256.c
 
 $(EXE): $(SRC)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
